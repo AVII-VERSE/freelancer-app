@@ -3,7 +3,7 @@ import { useAuthStore } from '../../store/auth.store';
 import { useEffect, useState } from 'react';
 import api from '../../lib/api';
 import {
-  LayoutDashboard, FileText, Layers, Bot, BarChart3, Clock, LogOut, Zap,
+  LayoutDashboard, FileText, Layers, Bot, BarChart3, Clock, LogOut, Zap, User,
 } from 'lucide-react';
 
 const navItems = [
@@ -13,6 +13,7 @@ const navItems = [
   { path: '/ai', icon: Bot, label: 'AI Analysis' },
   { path: '/analytics', icon: BarChart3, label: 'Analytics' },
   { path: '/timezone', icon: Clock, label: 'Timezone Alerts' },
+  { path: '/profile', icon: User, label: 'Profile' },
 ];
 
 export default function Sidebar() {

@@ -7,6 +7,7 @@ import Proposals from './pages/Proposals';
 import Templates from './pages/Templates';
 import AIAnalysis from './pages/AIAnalysis';
 import Timezone from './pages/Timezone';
+import Profile from './pages/Profile';
 import { useAuthStore } from './store/auth.store';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -35,7 +36,8 @@ export default function App() {
         <Route path="/templates" element={<PrivateRoute><Templates /></PrivateRoute>} />
         <Route path="/ai" element={<PrivateRoute><AIAnalysis /></PrivateRoute>} />
         <Route path="/analytics" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-       <Route path="/timezone" element={<PrivateRoute><Timezone /></PrivateRoute>} />
+        <Route path="/timezone" element={<PrivateRoute><Timezone /></PrivateRoute>} />
+        <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
