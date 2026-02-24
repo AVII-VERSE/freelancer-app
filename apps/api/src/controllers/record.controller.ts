@@ -64,6 +64,59 @@ export const getRecord = async (req: Request, res: Response) => {
   }
 };
 
+export const updateRecord = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).userId;
+    const { id } = req.params;
+    const { title, description, clientCountry, timezone, techStack, bidAmount } = req.body;
+
+    const existing = await prisma.projectRecord.findFirst({
+      where: { id, userId },
+    });
+
+    if (!existing) {
+      return res.status(404).json({ message: 'Record not found' });
+    }
+
+    const record = await prisma.projectRecord.update({
+      where: { id },
+      data: {
+        title,
+        description,
+        clientCountry,
+        timezone,
+        techStack,
+        bidAmount,
+      },
+    });
+
+    res.json({ message: 'Record updated successfully', record });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export const deleteRecord = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).userId;
+    const { id } = req.params;
+
+    const existing = await prisma.projectRecord.findFirst({
+      where: { id, userId },
+    });
+
+    if (!existing) {
+      return res.status(404).json({ message: 'Record not found' });
+    }
+
+    await prisma.projectRecord.delete({ where: { id } });
+
+    res.json({ message: 'Record deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 export const getAnalytics = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
@@ -109,35 +162,6 @@ export const getAnalytics = async (req: Request, res: Response) => {
         techStackUsage: techCount,
       },
     });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
-export const getProposalActivity = async (req: Request, res: Response) => {
-  try {
-    const userId = (req as any).userId;
-    
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-    const proposals = await prisma.proposal.findMany({
-      where: {
-        userId,
-        createdAt: { gte: sevenDaysAgo },
-      },
-      select: { createdAt: true },
-    });
-
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const activity = days.map(day => ({ day, proposals: 0 }));
-
-    proposals.forEach(p => {
-      const dayIndex = p.createdAt.getDay();
-      activity[dayIndex].proposals++;
-    });
-
-    res.json({ activity });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }

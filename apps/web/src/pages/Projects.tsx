@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
-import { Plus, Folder, Trash2, Search, DollarSign, Globe, Code, Briefcase, Loader2 } from 'lucide-react';
+import { Plus, Folder, Trash2, Search, DollarSign, Globe, Code, Briefcase, Loader2, Edit2 } from 'lucide-react';
 import Layout from '../components/layout/Layout';
 
 interface ProjectRecord {
@@ -27,6 +27,7 @@ export default function Projects() {
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [filtered, setFiltered] = useState<ProjectRecord[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({
     proposalId: '',
     title: '',
@@ -67,24 +68,51 @@ export default function Projects() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await api.post('/records', {
-        proposalId: form.proposalId || undefined,
-        title: form.title,
-        description: form.description,
-        clientCountry: form.clientCountry,
-        timezone: form.timezone,
-        techStack: form.techStack.split(',').map(s => s.trim()).filter(Boolean),
-        bidAmount: form.bidAmount ? parseFloat(form.bidAmount) : undefined,
-      });
-      toast.success('Project added!');
+      if (editingId) {
+        await api.put(`/records/${editingId}`, {
+          title: form.title,
+          description: form.description,
+          clientCountry: form.clientCountry,
+          timezone: form.timezone,
+          techStack: form.techStack.split(',').map(s => s.trim()).filter(Boolean),
+          bidAmount: form.bidAmount ? parseFloat(form.bidAmount) : undefined,
+        });
+        toast.success('Project updated!');
+        setEditingId(null);
+      } else {
+        await api.post('/records', {
+          proposalId: form.proposalId || undefined,
+          title: form.title,
+          description: form.description,
+          clientCountry: form.clientCountry,
+          timezone: form.timezone,
+          techStack: form.techStack.split(',').map(s => s.trim()).filter(Boolean),
+          bidAmount: form.bidAmount ? parseFloat(form.bidAmount) : undefined,
+        });
+        toast.success('Project added!');
+      }
       setShowForm(false);
       setForm({ proposalId: '', title: '', description: '', clientCountry: '', timezone: '', techStack: '', bidAmount: '' });
       fetchData();
     } catch {
-      toast.error('Failed to add project');
+      toast.error(editingId ? 'Failed to update project' : 'Failed to add project');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleEdit = (record: ProjectRecord) => {
+    setEditingId(record.id);
+    setForm({
+      proposalId: '',
+      title: record.title,
+      description: record.description || '',
+      clientCountry: record.clientCountry || '',
+      timezone: record.timezone || '',
+      techStack: record.techStack?.join(', ') || '',
+      bidAmount: record.bidAmount?.toString() || '',
+    });
+    setShowForm(true);
   };
 
   const handleDelete = async (id: string) => {
@@ -118,10 +146,10 @@ export default function Projects() {
           </button>
         </div>
 
-        {/* Add Form */}
+        {/* Add/Edit Form */}
         {showForm && (
           <form onSubmit={handleSubmit} className="bg-gray-900 rounded-2xl p-6 border border-gray-800 mb-6 space-y-4">
-            <h2 className="text-lg font-semibold">Add New Project</h2>
+            <h2 className="text-lg font-semibold">{editingId ? 'Edit Project' : 'Add New Project'}</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -257,12 +285,22 @@ export default function Projects() {
             <div key={record.id} className="bg-gray-900 rounded-2xl border border-gray-800 p-5">
               <div className="flex items-start justify-between mb-3">
                 <h3 className="font-semibold text-white">{record.title}</h3>
-                <button
-                  onClick={() => handleDelete(record.id)}
-                  className="text-gray-500 hover:text-red-400 transition"
-                >
-                  <Trash2 size={15} />
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(record)}
+                    className="text-gray-500 hover:text-blue-400 transition"
+                    title="Edit project"
+                  >
+                    <Edit2 size={15} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(record.id)}
+                    className="text-gray-500 hover:text-red-400 transition"
+                    title="Delete project"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
               </div>
               
               {record.description && (
