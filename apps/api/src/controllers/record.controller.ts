@@ -113,3 +113,32 @@ export const getAnalytics = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+export const getProposalActivity = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).userId;
+    
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const proposals = await prisma.proposal.findMany({
+      where: {
+        userId,
+        createdAt: { gte: sevenDaysAgo },
+      },
+      select: { createdAt: true },
+    });
+
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const activity = days.map(day => ({ day, proposals: 0 }));
+
+    proposals.forEach(p => {
+      const dayIndex = p.createdAt.getDay();
+      activity[dayIndex].proposals++;
+    });
+
+    res.json({ activity });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};

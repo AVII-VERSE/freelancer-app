@@ -27,12 +27,18 @@ export const createProposal = async (req: Request, res: Response) => {
 export const getProposals = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
-    const { status } = req.query;
+    const { status, search } = req.query;
 
     const proposals = await prisma.proposal.findMany({
       where: {
         userId,
         ...(status && { status: String(status) }),
+        ...(search && {
+          OR: [
+            { title: { contains: String(search), mode: 'insensitive' } },
+            { content: { contains: String(search), mode: 'insensitive' } },
+          ],
+        }),
         expiresAt: { gte: new Date() },
       },
       orderBy: { createdAt: 'desc' },

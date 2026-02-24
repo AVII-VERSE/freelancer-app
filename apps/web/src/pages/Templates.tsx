@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
-import { Plus, Layers, Trash2, Search, Copy, FileText, Lightbulb, BookOpen } from 'lucide-react';
+import { Plus, Layers, Trash2, Search, Copy, FileText, Lightbulb, BookOpen, Files } from 'lucide-react';
 import Layout from '../components/layout/Layout';
 
 interface Template {
@@ -316,17 +316,19 @@ export default function Templates() {
                       className="text-gray-500 hover:text-green-400 transition"
                       title="Duplicate template"
                     >
-                      <Copy size={15} />
+                      <Files size={15} />
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); handleCopy(template.content); }}
                       className="text-gray-500 hover:text-blue-400 transition"
+                      title="Copy content"
                     >
                       <Copy size={15} />
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); handleDelete(template.id); }}
                       className="text-gray-500 hover:text-red-400 transition"
+                      title="Delete template"
                     >
                       <Trash2 size={15} />
                     </button>

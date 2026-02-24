@@ -31,15 +31,37 @@ interface Analytics {
   techStackUsage: Record<string, number>;
 }
 
+interface ActivityData {
+  day: string;
+  proposals: number;
+}
+
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
 export default function Dashboard() {
   const { user } = useAuthStore();
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
+  const [activity, setActivity] = useState<ActivityData[]>([
+    { day: 'Sun', proposals: 0 },
+    { day: 'Mon', proposals: 0 },
+    { day: 'Tue', proposals: 0 },
+    { day: 'Wed', proposals: 0 },
+    { day: 'Thu', proposals: 0 },
+    { day: 'Fri', proposals: 0 },
+    { day: 'Sat', proposals: 0 },
+  ]);
 
   useEffect(() => {
-    api.get('/records/analytics')
-      .then((res) => setAnalytics(res.data.analytics))
+    Promise.all([
+      api.get('/records/analytics'),
+      api.get('/records/activity'),
+    ])
+      .then(([analyticsRes, activityRes]) => {
+        setAnalytics(analyticsRes.data.analytics);
+        if (activityRes.data.activity) {
+          setActivity(activityRes.data.activity);
+        }
+      })
       .catch(() => {});
   }, []);
 
@@ -54,16 +76,6 @@ export default function Dashboard() {
   const techData = analytics
     ? Object.entries(analytics.techStackUsage).map(([name, value]) => ({ name, value }))
     : [];
-
-  const areaData = [
-    { day: 'Mon', proposals: 2 },
-    { day: 'Tue', proposals: 4 },
-    { day: 'Wed', proposals: 3 },
-    { day: 'Thu', proposals: 6 },
-    { day: 'Fri', proposals: 5 },
-    { day: 'Sat', proposals: 8 },
-    { day: 'Sun', proposals: 4 },
-  ];
 
   const stats = [
     { label: 'Total Proposals', value: analytics?.totalProposals || 0, icon: FileText, color: '#60a5fa' },
@@ -119,7 +131,7 @@ export default function Dashboard() {
               <span className="rounded-full bg-gray-800 px-3 py-1 text-xs text-gray-400">This Week</span>
             </div>
             <ResponsiveContainer width="100%" height={200}>
-              <AreaChart data={areaData}>
+              <AreaChart data={activity}>
                 <defs>
                   <linearGradient id="colorProposals" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />

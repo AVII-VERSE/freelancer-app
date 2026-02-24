@@ -125,6 +125,10 @@ export const duplicateTemplate = async (req: Request, res: Response) => {
         category: existing.category,
         strategy: existing.strategy,
         content: existing.content,
+        instructions: existing.instructions,
+        example: existing.example,
+        purpose: existing.purpose,
+        fileNotes: existing.fileNotes,
       },
     });
 

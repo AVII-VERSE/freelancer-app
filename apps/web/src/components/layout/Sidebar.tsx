@@ -3,13 +3,14 @@ import { useAuthStore } from '../../store/auth.store';
 import { useEffect, useState } from 'react';
 import api from '../../lib/api';
 import {
-  LayoutDashboard, FileText, Layers, Bot, BarChart3, Clock, LogOut, Zap, User,
+  LayoutDashboard, FileText, Layers, Bot, BarChart3, Clock, LogOut, Zap, User, Folder,
 } from 'lucide-react';
 
 const navItems = [
   { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { path: '/proposals', icon: FileText, label: 'Proposals' },
   { path: '/templates', icon: Layers, label: 'Templates' },
+  { path: '/projects', icon: Folder, label: 'Projects' },
   { path: '/ai', icon: Bot, label: 'AI Analysis' },
   { path: '/analytics', icon: BarChart3, label: 'Analytics' },
   { path: '/timezone', icon: Clock, label: 'Timezone Alerts' },

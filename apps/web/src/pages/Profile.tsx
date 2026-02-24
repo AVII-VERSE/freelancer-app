@@ -51,7 +51,6 @@ export default function Profile() {
     e.preventDefault();
     setLoading(true);
     try {
-      const [name, timezone] = profileData.name.split('|');
       await api.put('/profile/user', {
         name: profileData.name,
         timezone: profileData.timezone,

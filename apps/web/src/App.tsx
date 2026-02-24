@@ -9,6 +9,7 @@ import AIAnalysis from './pages/AIAnalysis';
 import Timezone from './pages/Timezone';
 import Profile from './pages/Profile';
 import Analytics from './pages/Analytics';
+import Projects from './pages/Projects';
 import { useAuthStore } from './store/auth.store';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -39,6 +40,7 @@ export default function App() {
         <Route path="/analytics" element={<PrivateRoute><Analytics /></PrivateRoute>} />
         <Route path="/timezone" element={<PrivateRoute><Timezone /></PrivateRoute>} />
         <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+        <Route path="/projects" element={<PrivateRoute><Projects /></PrivateRoute>} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
