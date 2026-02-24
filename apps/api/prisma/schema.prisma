@@ -22,6 +22,7 @@ model User {
   proposals Proposal[]
   templates Template[]
   records   ProjectRecord[]
+  timezoneAlerts TimezoneAlert[]
 }
 
 model UserProfile {
