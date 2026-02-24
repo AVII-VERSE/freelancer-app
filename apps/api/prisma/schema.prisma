@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String?
+  googleId  String?  @unique
+  avatar    String?
+  timezone  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile   UserProfile?
+  proposals Proposal[]
+  templates Template[]
+  records   ProjectRecord[]
+}
+
+model UserProfile {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  bio        String?
+  skills     String[]
+  experience String?
+  hourlyRate Float?
+  platforms  String[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Template {
+  id       String @id @default(cuid())
+  userId   String
+  name     String
+  category String?
+  strategy String?
+  content  Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Proposal {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  content   String
+  status    String   @default("pending")
+  bidAmount Float?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user   User           @relation(fields: [userId], references: [id])
+  record ProjectRecord?
+}
+
+model ProjectRecord {
+  id            String   @id @default(cuid())
+  userId        String
+  proposalId    String   @unique
+  title         String
+  description   String?
+  clientCountry String?
+  timezone      String?
+  techStack     String[]
+  bidAmount     Float?
+  createdAt     DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id])
+  proposal Proposal @relation(fields: [proposalId], references: [id])
+}
