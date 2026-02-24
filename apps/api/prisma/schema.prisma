@@ -39,12 +39,16 @@ model UserProfile {
 }
 
 model Template {
-  id       String @id @default(cuid())
-  userId   String
-  name     String
-  category String?
-  strategy String?
-  content  Json
+  id          String  @id @default(cuid())
+  userId      String
+  name        String
+  category    String?
+  strategy    String?
+  content     Json
+  instructions String?
+  example     String?
+  purpose     String?
+  fileNotes   String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

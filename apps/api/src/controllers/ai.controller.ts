@@ -67,18 +67,10 @@ export const analyzeProject = async (req: Request, res: Response) => {
 export const generateProposal = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
-    const { projectDescription, templateId } = req.body;
+    const { projectDescription, templateInstructions, templateExample } = req.body;
 
     if (!projectDescription) {
       return res.status(400).json({ message: 'Project description is required' });
-    }
-
-    let templateContent = null;
-    if (templateId) {
-      const template = await prisma.template.findFirst({
-        where: { id: templateId, userId },
-      });
-      templateContent = template?.content;
     }
 
     const completion = await groq.chat.completions.create({
@@ -86,7 +78,9 @@ export const generateProposal = async (req: Request, res: Response) => {
       messages: [
         {
           role: 'system',
-          content: `You are an expert freelance proposal writer. Write compelling, personalized proposals that win projects. Return ONLY the proposal text.`,
+          content: templateInstructions 
+            ? `You are an expert freelance proposal writer. Follow these instructions when writing: ${templateInstructions}`
+            : `You are an expert freelance proposal writer. Write compelling, personalized proposals that win projects. Return ONLY the proposal text.`,
         },
         {
           role: 'user',
@@ -94,7 +88,8 @@ export const generateProposal = async (req: Request, res: Response) => {
             Write a winning freelance proposal for this project:
 
             Project Description: ${projectDescription}
-            ${templateContent ? `Use this structure: ${JSON.stringify(templateContent)}` : ''}
+            
+            ${templateExample ? `Follow this example structure/style:\n${templateExample}` : ''}
 
             Write a professional, concise and compelling proposal.
           `,

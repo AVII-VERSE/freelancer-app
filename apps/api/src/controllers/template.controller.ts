@@ -4,14 +4,14 @@ import { prisma } from '../lib/prisma';
 export const createTemplate = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
-    const { name, category, strategy, content } = req.body;
+    const { name, category, strategy, content, instructions, example, purpose, fileNotes } = req.body;
 
     if (!name || !content) {
       return res.status(400).json({ message: 'Name and content are required' });
     }
 
     const template = await prisma.template.create({
-      data: { userId, name, category, strategy, content },
+      data: { userId, name, category, strategy, content, instructions, example, purpose, fileNotes },
     });
 
     res.status(201).json({ message: 'Template created successfully', template });
@@ -63,7 +63,7 @@ export const updateTemplate = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
     const { id } = req.params;
-    const { name, category, strategy, content } = req.body;
+    const { name, category, strategy, content, instructions, example, purpose, fileNotes } = req.body;
 
     const existing = await prisma.template.findFirst({
       where: { id, userId },
@@ -75,7 +75,7 @@ export const updateTemplate = async (req: Request, res: Response) => {
 
     const template = await prisma.template.update({
       where: { id },
-      data: { name, category, strategy, content },
+      data: { name, category, strategy, content, instructions, example, purpose, fileNotes },
     });
 
     res.json({ message: 'Template updated successfully', template });

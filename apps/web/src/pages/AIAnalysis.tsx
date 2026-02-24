@@ -1,18 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
-import { Bot, Loader, Copy, Save, Zap, AlertTriangle, Target, Clock, DollarSign } from 'lucide-react';
+import { Bot, Loader2, Copy, Save, Zap, AlertTriangle, Target, Clock, DollarSign, Layers } from 'lucide-react';
 import Layout from '../components/layout/Layout';
+
+interface Template {
+  id: string;
+  name: string;
+  instructions: string;
+  example: string;
+  purpose: string;
+}
 
 export default function AIAnalysis() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [clientCountry, setClientCountry] = useState('');
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState('');
   const [analysis, setAnalysis] = useState<any>(null);
   const [proposal, setProposal] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    api.get('/templates')
+      .then(res => setTemplates(res.data.templates))
+      .catch(() => {});
+  }, []);
+
+  const selectedTemplateData = templates.find(t => t.id === selectedTemplate);
 
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +51,12 @@ export default function AIAnalysis() {
   const handleGenerate = async () => {
     setIsGenerating(true);
     try {
-      const res = await api.post('/ai/generate', { projectDescription: description });
+      const templateData = templates.find(t => t.id === selectedTemplate);
+      const res = await api.post('/ai/generate', { 
+        projectDescription: description,
+        templateInstructions: templateData?.instructions || '',
+        templateExample: templateData?.example || '',
+      });
       setProposal(res.data.proposal);
       toast.success('Proposal generated!');
     } catch {
@@ -121,13 +144,36 @@ export default function AIAnalysis() {
                 />
               </div>
 
+              {templates.length > 0 && (
+                <div>
+                  <label className="text-sm text-gray-400 mb-1 block flex items-center gap-2">
+                    <Layers size={14} /> Use Template for Proposal
+                  </label>
+                  <select
+                    value={selectedTemplate}
+                    onChange={(e) => setSelectedTemplate(e.target.value)}
+                    className="w-full bg-gray-800 text-white rounded-xl px-4 py-3 border border-gray-700 focus:outline-none focus:border-green-500"
+                  >
+                    <option value="">No template - Generate freely</option>
+                    {templates.map(template => (
+                      <option key={template.id} value={template.id}>
+                        {template.name} {template.purpose ? `(${template.purpose})` : ''}
+                      </option>
+                    ))}
+                  </select>
+                  {selectedTemplateData && selectedTemplateData.instructions && (
+                    <p className="text-xs text-green-400 mt-1">✓ Will use template instructions</p>
+                  )}
+                </div>
+              )}
+
               <button
                 type="submit"
                 disabled={isAnalyzing}
                 className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-xl transition disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {isAnalyzing
-                  ? <><Loader size={16} className="animate-spin" /> Analyzing with AI...</>
+                  ? <><Loader2 size={16} className="animate-spin" /> Analyzing with AI...</>
                   : <><Zap size={16} /> Analyze Project</>
                 }
               </button>
@@ -141,7 +187,7 @@ export default function AIAnalysis() {
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 rounded-xl transition disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {isGenerating
-                  ? <><Loader size={16} className="animate-spin" /> Generating Proposal...</>
+                  ? <><Loader2 size={16} className="animate-spin" /> Generating Proposal...</>
                   : <><Bot size={16} /> Generate Winning Proposal</>
                 }
               </button>
@@ -159,7 +205,7 @@ export default function AIAnalysis() {
 
             {isAnalyzing && (
               <div className="bg-gray-900 rounded-2xl border border-gray-800 h-64 flex flex-col items-center justify-center">
-                <Loader size={32} className="animate-spin text-green-400 mb-3" />
+                <Loader2 size={32} className="animate-spin text-green-400 mb-3" />
                 <p className="text-gray-400">AI is analyzing your project...</p>
               </div>
             )}
