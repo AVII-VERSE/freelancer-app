@@ -86,7 +86,7 @@ export default function Sidebar() {
       {/* User */}
       <div className="border-t border-gray-800 p-4">
         {completion && completion.percentage < 100 && (
-          <div className="mb-3 p-2 rounded-lg bg-yellow-900/20 border border-yellow-700/30">
+          <Link to="/profile" className="block mb-3 p-2 rounded-lg bg-yellow-900/20 border border-yellow-700/30 hover:bg-yellow-900/30 transition cursor-pointer">
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs text-yellow-400">Profile {completion.percentage}% complete</span>
               <span className="text-xs text-yellow-400">{completion.percentage}%</span>
@@ -97,7 +97,7 @@ export default function Sidebar() {
                 style={{ width: `${completion.percentage}%` }}
               />
             </div>
-          </div>
+          </Link>
         )}
         <div className="flex items-center gap-3 rounded-xl bg-gray-900 px-4 py-3">
           <div
