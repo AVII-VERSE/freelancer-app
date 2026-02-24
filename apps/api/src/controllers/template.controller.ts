@@ -104,3 +104,32 @@ export const deleteTemplate = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+export const duplicateTemplate = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).userId;
+    const { id } = req.params;
+
+    const existing = await prisma.template.findFirst({
+      where: { id, userId },
+    });
+
+    if (!existing) {
+      return res.status(404).json({ message: 'Template not found' });
+    }
+
+    const template = await prisma.template.create({
+      data: {
+        userId,
+        name: `${existing.name} (Copy)`,
+        category: existing.category,
+        strategy: existing.strategy,
+        content: existing.content,
+      },
+    });
+
+    res.status(201).json({ message: 'Template duplicated successfully', template });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};

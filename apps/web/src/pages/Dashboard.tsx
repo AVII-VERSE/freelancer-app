@@ -14,7 +14,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { Bot, Clock, FileText, Plus, TrendingUp, Trophy, Zap } from 'lucide-react';
+import { Bot, Clock, FileText, Plus, TrendingUp, Trophy, Zap, DollarSign } from 'lucide-react';
 import Layout from '../components/layout/Layout';
 import { useAuthStore } from '../store/auth.store';
 import api from '../lib/api';
@@ -25,6 +25,9 @@ interface Analytics {
   lostProposals: number;
   pendingProposals: number;
   successRate: string;
+  winRate: string;
+  totalEarnings: number;
+  totalTemplates: number;
   techStackUsage: Record<string, number>;
 }
 
@@ -66,7 +69,8 @@ export default function Dashboard() {
     { label: 'Total Proposals', value: analytics?.totalProposals || 0, icon: FileText, color: '#60a5fa' },
     { label: 'Won Projects', value: analytics?.wonProposals || 0, icon: Trophy, color: '#34d399' },
     { label: 'Pending', value: analytics?.pendingProposals || 0, icon: Clock, color: '#fbbf24' },
-    { label: 'Success Rate', value: analytics?.successRate || '0%', icon: TrendingUp, color: '#a78bfa' },
+    { label: 'Win Rate', value: analytics?.winRate || '0%', icon: TrendingUp, color: '#a78bfa' },
+    { label: 'Total Earnings', value: `$${analytics?.totalEarnings || 0}`, icon: DollarSign, color: '#34d399' },
   ];
 
   const quickActions = [
@@ -92,7 +96,7 @@ export default function Dashboard() {
           </Link>
         </div>
 
-        <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-5">
           {stats.map((stat) => (
             <div key={stat.label} className="rounded-2xl border border-gray-800 bg-gray-900 p-5">
               <div className="mb-4 flex items-center justify-between">

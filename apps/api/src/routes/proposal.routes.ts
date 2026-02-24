@@ -5,6 +5,7 @@ import {
   getProposal,
   updateProposalStatus,
   deleteProposal,
+  cloneProposal,
 } from '../controllers/proposal.controller';
 import { protect } from '../middleware/auth';
 
@@ -15,5 +16,6 @@ router.get('/', protect, getProposals);
 router.get('/:id', protect, getProposal);
 router.put('/:id/status', protect, updateProposalStatus);
 router.delete('/:id', protect, deleteProposal);
+router.post('/:id/clone', protect, cloneProposal);
 
 export default router;

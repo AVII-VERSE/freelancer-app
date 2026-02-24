@@ -74,6 +74,7 @@ export const getAnalytics = async (req: Request, res: Response) => {
     const pendingProposals = await prisma.proposal.count({ where: { userId, status: 'pending' } });
 
     const successRate = totalProposals > 0 ? ((wonProposals / totalProposals) * 100).toFixed(1) : '0';
+    const winRate = (wonProposals + lostProposals) > 0 ? ((wonProposals / (wonProposals + lostProposals)) * 100).toFixed(1) : '0';
 
     const topTechStack = await prisma.projectRecord.findMany({
       where: { userId },
@@ -87,6 +88,14 @@ export const getAnalytics = async (req: Request, res: Response) => {
       });
     });
 
+    const wonProjectRecords = await prisma.projectRecord.findMany({
+      where: { userId, proposal: { status: 'won' } },
+      select: { bidAmount: true },
+    });
+    const totalEarnings = wonProjectRecords.reduce((sum, r) => sum + (r.bidAmount || 0), 0);
+
+    const totalTemplates = await prisma.template.count({ where: { userId } });
+
     res.json({
       analytics: {
         totalProposals,
@@ -94,6 +103,9 @@ export const getAnalytics = async (req: Request, res: Response) => {
         lostProposals,
         pendingProposals,
         successRate: `${successRate}%`,
+        winRate: `${winRate}%`,
+        totalEarnings,
+        totalTemplates,
         techStackUsage: techCount,
       },
     });

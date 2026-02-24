@@ -18,6 +18,7 @@ export default function Templates() {
   const [showForm, setShowForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
   const [expanded, setExpanded] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: '', category: '', strategy: '',
@@ -70,15 +71,28 @@ export default function Templates() {
     }
   };
 
+  const handleDuplicate = async (id: string) => {
+    try {
+      await api.post(`/templates/${id}/duplicate`);
+      toast.success('Template duplicated!');
+      fetchTemplates();
+    } catch {
+      toast.error('Failed to duplicate');
+    }
+  };
+
   const handleCopy = (content: any) => {
     const text = Object.values(content).filter(Boolean).join('\n\n');
     navigator.clipboard.writeText(text as string);
     toast.success('Copied to clipboard!');
   };
 
-  const filtered = templates.filter(t =>
-    t.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = templates.filter(t => {
+    const matchesSearch = t.name.toLowerCase().includes(search.toLowerCase()) ||
+      (t.category && t.category.toLowerCase().includes(search.toLowerCase()));
+    const matchesCategory = categoryFilter === 'all' || t.category === categoryFilter;
+    return matchesSearch && matchesCategory;
+  });
 
   const categoryColors: Record<string, string> = {
     greeting: 'text-gray-400 bg-gray-400/10 border-gray-400/20',
@@ -191,15 +205,30 @@ export default function Templates() {
           </form>
         )}
 
-        {/* Search */}
-        <div className="relative mb-6">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-gray-900 text-white rounded-xl pl-10 pr-4 py-3 border border-gray-800 focus:outline-none focus:border-blue-500"
-            placeholder="Search templates..."
-          />
+        {/* Search & Filter */}
+        <div className="flex gap-3 mb-6">
+          <div className="flex-1 relative">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-gray-900 text-white rounded-xl pl-10 pr-4 py-3 border border-gray-800 focus:outline-none focus:border-blue-500"
+              placeholder="Search templates..."
+            />
+          </div>
+          <div className="relative">
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="bg-gray-900 text-white rounded-xl px-4 py-3 border border-gray-800 focus:outline-none focus:border-blue-500 appearance-none"
+            >
+              <option value="all">All Categories</option>
+              <option value="greeting">Greeting</option>
+              <option value="opening">Opening</option>
+              <option value="strategy">Strategy</option>
+              <option value="closing">Closing</option>
+            </select>
+          </div>
         </div>
 
         {/* Templates Grid */}
@@ -219,6 +248,13 @@ export default function Templates() {
                 <div className="flex items-start justify-between mb-3">
                   <h3 className="font-semibold text-white">{template.name}</h3>
                   <div className="flex gap-2">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleDuplicate(template.id); }}
+                      className="text-gray-500 hover:text-green-400 transition"
+                      title="Duplicate template"
+                    >
+                      <Copy size={15} />
+                    </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); handleCopy(template.content); }}
                       className="text-gray-500 hover:text-blue-400 transition"

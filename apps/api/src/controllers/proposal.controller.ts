@@ -114,3 +114,35 @@ export const deleteProposal = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+export const cloneProposal = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).userId;
+    const { id } = req.params;
+
+    const existing = await prisma.proposal.findFirst({
+      where: { id, userId },
+    });
+
+    if (!existing) {
+      return res.status(404).json({ message: 'Proposal not found' });
+    }
+
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
+
+    const proposal = await prisma.proposal.create({
+      data: {
+        userId,
+        title: `${existing.title} (Copy)`,
+        content: existing.content,
+        bidAmount: existing.bidAmount,
+        expiresAt,
+      },
+    });
+
+    res.status(201).json({ message: 'Proposal cloned successfully', proposal });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};

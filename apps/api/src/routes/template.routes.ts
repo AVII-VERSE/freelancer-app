@@ -5,6 +5,7 @@ import {
   getTemplate,
   updateTemplate,
   deleteTemplate,
+  duplicateTemplate,
 } from '../controllers/template.controller';
 import { protect } from '../middleware/auth';
 
@@ -15,5 +16,6 @@ router.get('/', protect, getTemplates);
 router.get('/:id', protect, getTemplate);
 router.put('/:id', protect, updateTemplate);
 router.delete('/:id', protect, deleteTemplate);
+router.post('/:id/duplicate', protect, duplicateTemplate);
 
 export default router;

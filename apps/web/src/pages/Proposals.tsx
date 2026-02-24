@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
-import { Plus, FileText, Trash2, Search, Filter } from 'lucide-react';
+import { Plus, FileText, Trash2, Search, Filter, Copy } from 'lucide-react';
 import Layout from '../components/layout/Layout';
 
 interface Proposal {
@@ -76,6 +76,16 @@ export default function Proposals() {
       fetchProposals();
     } catch {
       toast.error('Failed to delete');
+    }
+  };
+
+  const handleClone = async (id: string) => {
+    try {
+      await api.post(`/proposals/${id}/clone`);
+      toast.success('Proposal cloned!');
+      fetchProposals();
+    } catch {
+      toast.error('Failed to clone');
     }
   };
 
@@ -218,6 +228,13 @@ export default function Proposals() {
                     {proposal.bidAmount && (
                       <span className="text-blue-400 font-semibold">${proposal.bidAmount}</span>
                     )}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleClone(proposal.id); }}
+                      className="text-gray-600 hover:text-blue-400 transition"
+                      title="Clone proposal"
+                    >
+                      <Copy size={16} />
+                    </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); handleDelete(proposal.id); }}
                       className="text-gray-600 hover:text-red-400 transition"
