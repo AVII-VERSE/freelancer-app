@@ -54,6 +54,7 @@ export default function AIAnalysis() {
       const templateData = templates.find(t => t.id === selectedTemplate);
       const res = await api.post('/ai/generate', { 
         projectDescription: description,
+        projectTitle: title,
         templateInstructions: templateData?.instructions || '',
         templateExample: templateData?.example || '',
       });
