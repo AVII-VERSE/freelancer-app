@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Layout from '../components/layout/Layout';
 import { Clock, Bell, Globe, Plus, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import api from '../lib/api';
 
 interface TimezoneAlert {
   id: string;
@@ -64,15 +65,14 @@ export default function Timezone() {
   const [selected, setSelected] = useState('');
 
   useEffect(() => {
-    const saved = localStorage.getItem('timezoneAlerts');
-    if (saved) {
-      setAlerts(JSON.parse(saved));
-    }
+    api.get('/timezone')
+      .then(res => {
+        if (res.data.alerts) {
+          setAlerts(res.data.alerts);
+        }
+      })
+      .catch(() => {});
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem('timezoneAlerts', JSON.stringify(alerts));
-  }, [alerts]);
 
   useEffect(() => {
     const update = () => {
@@ -87,7 +87,7 @@ export default function Timezone() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleAddAlert = () => {
+  const handleAddAlert = async () => {
     if (!selected) return;
     const tz = TIMEZONE_DATA.find((t) => t.timezone === selected);
     if (!tz) return;
@@ -95,26 +95,40 @@ export default function Timezone() {
       toast.error('Already added!');
       return;
     }
-    const newAlert: TimezoneAlert = {
-      id: Date.now().toString(),
-      name: tz.name,
-      timezone: tz.timezone,
-      alertTime: tz.bestTimes[0],
-      enabled: true,
-    };
-    setAlerts([...alerts, newAlert]);
+    try {
+      const res = await api.post('/timezone', {
+        name: tz.name,
+        timezone: tz.timezone,
+        alertTime: tz.bestTimes[0],
+      });
+      setAlerts([...alerts, res.data.alert]);
+      toast.success(`Alert added for ${tz.name}!`);
+    } catch {
+      toast.error('Failed to add alert');
+    }
     setShowAdd(false);
     setSelected('');
-    toast.success(`Alert added for ${tz.name}!`);
   };
 
-  const handleDelete = (id: string) => {
-    setAlerts(alerts.filter((a) => a.id !== id));
-    toast.success('Alert removed');
+  const handleDelete = async (id: string) => {
+    try {
+      await api.delete(`/timezone/${id}`);
+      setAlerts(alerts.filter((a) => a.id !== id));
+      toast.success('Alert removed');
+    } catch {
+      toast.error('Failed to delete');
+    }
   };
 
-  const handleToggle = (id: string) => {
-    setAlerts(alerts.map((a) => a.id === id ? { ...a, enabled: !a.enabled } : a));
+  const handleToggle = async (alert: TimezoneAlert) => {
+    try {
+      await api.put(`/timezone/${alert.id}`, {
+        enabled: !alert.enabled,
+      });
+      setAlerts(alerts.map((a) => a.id === alert.id ? { ...a, enabled: !a.enabled } : a));
+    } catch {
+      toast.error('Failed to update');
+    }
   };
 
   return (
@@ -222,7 +236,7 @@ export default function Timezone() {
                 )}
 
                 <button
-                  onClick={() => handleToggle(alert.id)}
+                  onClick={() => handleToggle(alert)}
                   className={`w-full py-2 rounded-lg text-sm font-medium transition ${
                     alert.enabled
                       ? 'bg-blue-600 hover:bg-blue-700 text-white'
