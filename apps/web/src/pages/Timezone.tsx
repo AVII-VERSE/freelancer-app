@@ -67,11 +67,14 @@ export default function Timezone() {
   useEffect(() => {
     api.get('/timezone')
       .then(res => {
-        if (res.data.alerts) {
+        console.log('API Response:', res.data);
+        if (res.data && res.data.alerts) {
           setAlerts(res.data.alerts);
         }
       })
-      .catch(() => {});
+      .catch(err => {
+        console.error('Failed to load timezone alerts:', err);
+      });
   }, []);
 
   useEffect(() => {
@@ -96,15 +99,20 @@ export default function Timezone() {
       return;
     }
     try {
+      console.log('Creating alert:', { name: tz.name, timezone: tz.timezone, alertTime: tz.bestTimes[0] });
       const res = await api.post('/timezone', {
         name: tz.name,
         timezone: tz.timezone,
         alertTime: tz.bestTimes[0],
       });
-      setAlerts([...alerts, res.data.alert]);
-      toast.success(`Alert added for ${tz.name}!`);
-    } catch {
-      toast.error('Failed to add alert');
+      console.log('Create response:', res.data);
+      if (res.data.alert) {
+        setAlerts([...alerts, res.data.alert]);
+        toast.success(`Alert added for ${tz.name}!`);
+      }
+    } catch (err: any) {
+      console.error('Failed to add alert:', err);
+      toast.error(err.response?.data?.message || 'Failed to add alert');
     }
     setShowAdd(false);
     setSelected('');

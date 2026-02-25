@@ -6,12 +6,15 @@ import { protect } from '../middleware/auth';
 export const getAlerts = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
+    console.log('Getting alerts for user:', userId);
     const alerts = await prisma.timezoneAlert.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
     });
+    console.log('Found alerts:', alerts.length);
     res.json({ alerts });
   } catch (error) {
+    console.error('Error getting alerts:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
