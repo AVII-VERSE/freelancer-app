@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Layout from '../components/layout/Layout';
-import { Clock, Globe, Plus, Trash2, Search, X } from 'lucide-react';
+import { Clock, Globe, Plus, Trash2, Search, X, Sparkles, UserCheck, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../lib/api';
 
@@ -14,30 +14,30 @@ interface TimezoneAlert {
 }
 
 const ALL_TIMEZONES = [
-  { name: 'USA (East)', timezone: 'America/New_York', offset: -5, flag: '🇺🇸' },
-  { name: 'USA (West)', timezone: 'America/Los_Angeles', offset: -8, flag: '🇺🇸' },
-  { name: 'USA (Central)', timezone: 'America/Chicago', offset: -6, flag: '🇺🇸' },
-  { name: 'United Kingdom', timezone: 'Europe/London', offset: 0, flag: '🇬🇧' },
-  { name: 'Germany', timezone: 'Europe/Berlin', offset: 1, flag: '🇩🇪' },
-  { name: 'France', timezone: 'Europe/Paris', offset: 1, flag: '🇫🇷' },
-  { name: 'Netherlands', timezone: 'Europe/Amsterdam', offset: 1, flag: '🇳🇱' },
-  { name: 'Australia (Sydney)', timezone: 'Australia/Sydney', offset: 11, flag: '🇦🇺' },
-  { name: 'Australia (Melbourne)', timezone: 'Australia/Melbourne', offset: 11, flag: '🇦🇺' },
-  { name: 'Canada (Toronto)', timezone: 'America/Toronto', offset: -5, flag: '🇨🇦' },
-  { name: 'Canada (Vancouver)', timezone: 'America/Vancouver', offset: -8, flag: '🇨🇦' },
-  { name: 'UAE', timezone: 'Asia/Dubai', offset: 4, flag: '🇦🇪' },
-  { name: 'India', timezone: 'Asia/Kolkata', offset: 5.5, flag: '🇮🇳' },
-  { name: 'Singapore', timezone: 'Asia/Singapore', offset: 8, flag: '🇸🇬' },
-  { name: 'Japan', timezone: 'Asia/Tokyo', offset: 9, flag: '🇯🇵' },
-  { name: 'South Korea', timezone: 'Asia/Seoul', offset: 9, flag: '🇰🇷' },
-  { name: 'China', timezone: 'Asia/Shanghai', offset: 8, flag: '🇨🇳' },
-  { name: 'Hong Kong', timezone: 'Asia/Hong_Kong', offset: 8, flag: '🇭🇰' },
-  { name: 'Brazil', timezone: 'America/Sao_Paulo', offset: -3, flag: '🇧🇷' },
-  { name: 'Mexico', timezone: 'America/Mexico_City', offset: -6, flag: '🇲🇽' },
-  { name: 'New Zealand', timezone: 'Pacific/Auckland', offset: 13, flag: '🇳🇿' },
-  { name: 'South Africa', timezone: 'Africa/Johannesburg', offset: 2, flag: '🇿🇦' },
-  { name: 'Russia (Moscow)', timezone: 'Europe/Moscow', offset: 3, flag: '🇷🇺' },
-  { name: 'Israel', timezone: 'Asia/Jerusalem', offset: 2, flag: '🇮🇱' },
+  { name: 'USA (East)', timezone: 'America/New_York', offset: -5, flag: '🇺🇸', businessHours: ['9 AM - 5 PM'] },
+  { name: 'USA (West)', timezone: 'America/Los_Angeles', offset: -8, flag: '🇺🇸', businessHours: ['9 AM - 5 PM'] },
+  { name: 'USA (Central)', timezone: 'America/Chicago', offset: -6, flag: '🇺🇸', businessHours: ['9 AM - 5 PM'] },
+  { name: 'United Kingdom', timezone: 'Europe/London', offset: 0, flag: '🇬🇧', businessHours: ['9 AM - 5 PM'] },
+  { name: 'Germany', timezone: 'Europe/Berlin', offset: 1, flag: '🇩🇪', businessHours: ['9 AM - 5 PM'] },
+  { name: 'France', timezone: 'Europe/Paris', offset: 1, flag: '🇫🇷', businessHours: ['9 AM - 5 PM'] },
+  { name: 'Netherlands', timezone: 'Europe/Amsterdam', offset: 1, flag: '🇳🇱', businessHours: ['9 AM - 5 PM'] },
+  { name: 'Australia (Sydney)', timezone: 'Australia/Sydney', offset: 11, flag: '🇦🇺', businessHours: ['9 AM - 5 PM'] },
+  { name: 'Australia (Melbourne)', timezone: 'Australia/Melbourne', offset: 11, flag: '🇦🇺', businessHours: ['9 AM - 5 PM'] },
+  { name: 'Canada (Toronto)', timezone: 'America/Toronto', offset: -5, flag: '🇨🇦', businessHours: ['9 AM - 5 PM'] },
+  { name: 'Canada (Vancouver)', timezone: 'America/Vancouver', offset: -8, flag: '🇨🇦', businessHours: ['9 AM - 5 PM'] },
+  { name: 'UAE', timezone: 'Asia/Dubai', offset: 4, flag: '🇦🇪', businessHours: ['9 AM - 6 PM'] },
+  { name: 'India', timezone: 'Asia/Kolkata', offset: 5.5, flag: '🇮🇳', businessHours: ['10 AM - 6 PM'] },
+  { name: 'Singapore', timezone: 'Asia/Singapore', offset: 8, flag: '🇸🇬', businessHours: ['9 AM - 6 PM'] },
+  { name: 'Japan', timezone: 'Asia/Tokyo', offset: 9, flag: '🇯🇵', businessHours: ['9 AM - 6 PM'] },
+  { name: 'South Korea', timezone: 'Asia/Seoul', offset: 9, flag: '🇰🇷', businessHours: ['9 AM - 6 PM'] },
+  { name: 'China', timezone: 'Asia/Shanghai', offset: 8, flag: '🇨🇳', businessHours: ['9 AM - 6 PM'] },
+  { name: 'Hong Kong', timezone: 'Asia/Hong_Kong', offset: 8, flag: '🇭🇰', businessHours: ['9 AM - 6 PM'] },
+  { name: 'Brazil', timezone: 'America/Sao_Paulo', offset: -3, flag: '🇧🇷', businessHours: ['9 AM - 6 PM'] },
+  { name: 'Mexico', timezone: 'America/Mexico_City', offset: -6, flag: '🇲🇽', businessHours: ['9 AM - 7 PM'] },
+  { name: 'New Zealand', timezone: 'Pacific/Auckland', offset: 13, flag: '🇳🇿', businessHours: ['9 AM - 5 PM'] },
+  { name: 'South Africa', timezone: 'Africa/Johannesburg', offset: 2, flag: '🇿🇦', businessHours: ['8 AM - 5 PM'] },
+  { name: 'Russia (Moscow)', timezone: 'Europe/Moscow', offset: 3, flag: '🇷🇺', businessHours: ['9 AM - 6 PM'] },
+  { name: 'Israel', timezone: 'Asia/Jerusalem', offset: 2, flag: '🇮🇱', businessHours: ['9 AM - 5 PM'] },
 ];
 
 function getCurrentTimeInZone(timezone: string) {
@@ -86,6 +86,9 @@ export default function Timezone() {
   const [alerts, setAlerts] = useState<TimezoneAlert[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [aiSearchTerm, setAiSearchTerm] = useState('');
+  const [aiSearching, setAiSearching] = useState(false);
+  const [aiResult, setAiResult] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -155,6 +158,46 @@ export default function Timezone() {
   const filteredTimezones = ALL_TIMEZONES.filter(tz =>
     tz.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleAISearch = async () => {
+    if (!aiSearchTerm.trim()) return;
+    setAiSearching(true);
+    setAiResult(null);
+    try {
+      const res = await api.post('/ai/find-timezone', { country: aiSearchTerm });
+      if (res.data?.timezone) {
+        setAiResult(res.data);
+        toast.success('Found timezone!');
+      }
+    } catch {
+      toast.error('Could not find timezone');
+    } finally {
+      setAiSearching(false);
+    }
+  };
+
+  const handleAddAIResult = async () => {
+    if (!aiResult) return;
+    if (alerts.find((a) => a.timezone === aiResult.timezone)) {
+      toast.error('Already in your list!');
+      return;
+    }
+    try {
+      const res = await api.post('/timezone', {
+        name: aiResult.name,
+        timezone: aiResult.timezone,
+        alertTime: '9:00 AM',
+      });
+      if (res.data?.alert) {
+        setAlerts([...alerts, res.data.alert]);
+        toast.success(`Added ${aiResult.name}!`);
+        setAiResult(null);
+        setAiSearchTerm('');
+      }
+    } catch {
+      toast.error('Failed to add');
+    }
+  };
 
   const myTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -239,6 +282,14 @@ export default function Timezone() {
                     <p className="text-sm text-gray-500">{getCurrentDateInZone(alert.timezone)}</p>
                   </div>
 
+                  {/* Client Availability */}
+                  <div className="mb-3 flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 text-xs bg-purple-500/10 border border-purple-500/20 px-2 py-1 rounded">
+                      <UserCheck size={12} className="text-purple-400" />
+                      <span className="text-purple-300">{tzData?.businessHours?.[0] || '9 AM - 5 PM'}</span>
+                    </div>
+                  </div>
+
                   {/* Time Difference */}
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-blue-400 bg-blue-400/10 px-2 py-1 rounded">
@@ -276,7 +327,55 @@ export default function Timezone() {
                 </button>
               </div>
 
-              {/* Search */}
+              {/* AI Search */}
+              <div className="p-4 border-b border-gray-800 bg-gradient-to-r from-purple-900/20 to-blue-900/20">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles size={16} className="text-purple-400" />
+                  <span className="text-white font-medium">AI Search</span>
+                  <span className="text-xs text-gray-400">(Find any country)</span>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={aiSearchTerm}
+                    onChange={(e) => setAiSearchTerm(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAISearch()}
+                    placeholder="e.g., Argentina, Philippines..."
+                    className="flex-1 bg-gray-800 text-white rounded-xl px-4 py-2 border border-gray-700 focus:outline-none focus:border-purple-500"
+                  />
+                  <button
+                    onClick={handleAISearch}
+                    disabled={aiSearching}
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl transition disabled:opacity-50 flex items-center gap-2"
+                  >
+                    {aiSearching ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
+                    {aiSearching ? 'Searching...' : 'Find'}
+                  </button>
+                </div>
+                
+                {/* AI Result */}
+                {aiResult && (
+                  <div className="mt-3 p-3 bg-gray-800 rounded-xl border border-purple-500/30">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl">{aiResult.flag}</span>
+                        <div>
+                          <p className="text-white font-medium">{aiResult.name}</p>
+                          <p className="text-xs text-gray-400">{aiResult.timezone} (UTC{aiResult.offset >= 0 ? '+' : ''}{aiResult.offset})</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={handleAddAIResult}
+                        className="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg text-sm"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Manual Search */}
               <div className="p-4 border-b border-gray-800">
                 <div className="relative">
                   <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
