@@ -1,0 +1,39 @@
+databases:
+  - name: freelancer-db
+    plan: free
+    databaseName: freelancer_db
+    user: freelancer_user
+
+services:
+  - type: web
+    name: freelancer-api
+    runtime: node
+    plan: free
+    buildCommand: corepack enable && pnpm install && pnpm --filter @freelancer/api exec prisma generate && pnpm --filter @freelancer/api build && pnpm --filter @freelancer/api exec prisma migrate deploy
+    startCommand: pnpm --filter @freelancer/api start
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: DATABASE_URL
+        fromDatabase:
+          name: freelancer-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_PROJECT_SEARCH_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+
+  - type: web
+    name: freelancer-web
+    runtime: static
+    buildCommand: corepack enable && pnpm install && pnpm --filter @freelancer/web build
+    staticPublishPath: apps/web/dist
+    autoDeploy: true
+    envVars:
+      - key: VITE_API_URL
+        value: https://freelancer-api.onrender.com/api/v1

@@ -44,6 +44,7 @@ pnpm install
 DATABASE_URL="postgresql://user:password@localhost:5432/freelancer"
 JWT_SECRET="your-secret-key"
 GROQ_API_KEY="your-groq-api-key"
+GROQ_PROJECT_SEARCH_API_KEY="your-groq-project-search-key"
 ```
 
 2. Create `.env` file in `apps/web/` for local development:
@@ -68,8 +69,14 @@ pnpm --filter @freelancer/api exec prisma migrate deploy
 ### Development
 
 ```bash
+# Stable full-stack startup (recommended): frees ports 5000/5001/5173, starts scraper + turbo dev
+pnpm dev:full
+
 # Run all apps in development mode
 pnpm dev
+
+# Free API/scraper/web dev ports if needed
+pnpm dev:kill-ports
 
 # Run only API
 pnpm --filter @freelancer/api dev
@@ -81,13 +88,7 @@ pnpm --filter @freelancer/web dev
 ### Ports And API URL Notes
 
 - API app listens on `5000` by default (local): `apps/api/src/index.ts`
-- Web defaults to `http://localhost:5001/api/v1` if `VITE_API_URL` is not set: `apps/web/src/lib/api.ts`
-- Docker maps API container `5000` to host `5001`: `docker-compose.yml`
-
-This means:
-
-- Docker setup works out-of-the-box with `5001`.
-- Local non-Docker setup should set `VITE_API_URL=http://localhost:5000/api/v1`.
+- Web defaults to `http://localhost:5000/api/v1` if `VITE_API_URL` is not set: `apps/web/src/lib/api.ts`
 
 ### Build
 
@@ -95,6 +96,25 @@ This means:
 # Build all apps
 pnpm build
 ```
+
+## Deploy On Render
+
+1. Push your latest code to GitHub.
+2. In Render, choose `New +` -> `Blueprint`.
+3. Select this repo and deploy using [render.yaml](render.yaml).
+4. After the first deploy, verify your API URL:
+	- API service URL should be `https://freelancer-api.onrender.com` if that name is available.
+	- If Render assigned a different API URL, update `VITE_API_URL` in the `freelancer-web` service env vars to:
+	  - `https://<your-api-service>.onrender.com/api/v1`
+5. Add required secret keys in the `freelancer-api` service:
+	- `GROQ_API_KEY`
+	- `GROQ_PROJECT_SEARCH_API_KEY`
+	- `OPENAI_API_KEY` (if you use OpenAI features)
+
+Render notes:
+- Database is provisioned automatically from the blueprint as `freelancer-db`.
+- Prisma generate/build/migrate runs during API build.
+- Local development commands are unchanged.
 
 ## Features
 
@@ -117,10 +137,12 @@ pnpm build
 - Proposals: create/list/status/delete/clone
 - AI: analyze + generate proposal
 - Records/Analytics: project records + dashboard analytics
+- Timezone: frontend page and backend persistence are fully active.
+- Quick Templates: backend persistence and routes are fully active.
+- Meetings: backend persistence and routes are fully active.
 
 ### Partially Wired
 
-- Timezone: frontend page is active; backend timezone persistence is not mounted.
 - Clients and Project Search pages are routed, but advanced persistence paths require additional Prisma models not included in the base schema.
 
 ### Experimental Backend Modules
