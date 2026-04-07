@@ -4,14 +4,14 @@ import { prisma } from '../lib/prisma';
 export const createTemplate = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
-    const { name, category, strategy, content, instructions, example, purpose, fileNotes } = req.body;
+    const { name, category, strategy, content } = req.body;
 
     if (!name || !content) {
       return res.status(400).json({ message: 'Name and content are required' });
     }
 
     const template = await prisma.template.create({
-      data: { userId, name, category, strategy, content, instructions, example, purpose, fileNotes },
+      data: { userId, name, category, strategy, content },
     });
 
     res.status(201).json({ message: 'Template created successfully', template });
@@ -43,7 +43,7 @@ export const getTemplates = async (req: Request, res: Response) => {
 export const getTemplate = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
-    const { id } = req.params;
+    const id = String(req.params.id);
 
     const template = await prisma.template.findFirst({
       where: { id, userId },
@@ -62,8 +62,8 @@ export const getTemplate = async (req: Request, res: Response) => {
 export const updateTemplate = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
-    const { id } = req.params;
-    const { name, category, strategy, content, instructions, example, purpose, fileNotes } = req.body;
+    const id = String(req.params.id);
+    const { name, category, strategy, content } = req.body;
 
     const existing = await prisma.template.findFirst({
       where: { id, userId },
@@ -75,7 +75,7 @@ export const updateTemplate = async (req: Request, res: Response) => {
 
     const template = await prisma.template.update({
       where: { id },
-      data: { name, category, strategy, content, instructions, example, purpose, fileNotes },
+      data: { name, category, strategy, content },
     });
 
     res.json({ message: 'Template updated successfully', template });
@@ -87,7 +87,7 @@ export const updateTemplate = async (req: Request, res: Response) => {
 export const deleteTemplate = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
-    const { id } = req.params;
+    const id = String(req.params.id);
 
     const existing = await prisma.template.findFirst({
       where: { id, userId },
@@ -108,7 +108,7 @@ export const deleteTemplate = async (req: Request, res: Response) => {
 export const duplicateTemplate = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
-    const { id } = req.params;
+    const id = String(req.params.id);
 
     const existing = await prisma.template.findFirst({
       where: { id, userId },
@@ -124,11 +124,7 @@ export const duplicateTemplate = async (req: Request, res: Response) => {
         name: `${existing.name} (Copy)`,
         category: existing.category,
         strategy: existing.strategy,
-        content: existing.content,
-        instructions: existing.instructions,
-        example: existing.example,
-        purpose: existing.purpose,
-        fileNotes: existing.fileNotes,
+        content: existing.content as any,
       },
     });
 

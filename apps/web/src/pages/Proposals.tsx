@@ -33,15 +33,7 @@ export default function Proposals() {
   const [expanded, setExpanded] = useState<string | null>(null);
 
   const fetchProposals = async () => {
-    const params = new URLSearchParams();
-    if (statusFilter !== 'all') {
-      params.append('status', statusFilter);
-    }
-    if (search) {
-      params.append('search', search);
-    }
-    const queryString = params.toString();
-    const res = await api.get(`/proposals${queryString ? `?${queryString}` : ''}`);
+    const res = await api.get('/proposals');
     setProposals(res.data.proposals);
     setFiltered(res.data.proposals);
   };

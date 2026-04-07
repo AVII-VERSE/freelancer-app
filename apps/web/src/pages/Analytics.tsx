@@ -15,12 +15,6 @@ interface Analytics {
   techStackUsage: Record<string, number>;
 }
 
-interface MonthlyStat {
-  month: string;
-  proposals: number;
-  won: number;
-}
-
 export default function Analytics() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);

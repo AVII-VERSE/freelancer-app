@@ -47,7 +47,7 @@ export const getRecords = async (req: Request, res: Response) => {
 export const getRecord = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
-    const { id } = req.params;
+    const id = String(req.params.id);
 
     const record = await prisma.projectRecord.findFirst({
       where: { id, userId },
@@ -67,7 +67,7 @@ export const getRecord = async (req: Request, res: Response) => {
 export const updateRecord = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
-    const { id } = req.params;
+    const id = String(req.params.id);
     const { title, description, clientCountry, timezone, techStack, bidAmount } = req.body;
 
     const existing = await prisma.projectRecord.findFirst({
@@ -99,7 +99,7 @@ export const updateRecord = async (req: Request, res: Response) => {
 export const deleteRecord = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
-    const { id } = req.params;
+    const id = String(req.params.id);
 
     const existing = await prisma.projectRecord.findFirst({
       where: { id, userId },

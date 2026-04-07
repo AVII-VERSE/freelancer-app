@@ -3,14 +3,16 @@ import { useAuthStore } from '../../store/auth.store';
 import { useEffect, useState } from 'react';
 import api from '../../lib/api';
 import {
-  LayoutDashboard, FileText, Layers, Bot, BarChart3, Clock, LogOut, Zap, User, Folder,
+  LayoutDashboard, Folder, Users, Search, FileText, Layers, Bot, BarChart3, Clock, LogOut, Zap, User,
 } from 'lucide-react';
 
 const navItems = [
   { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { path: '/projects', icon: Folder, label: 'Projects' },
+  { path: '/clients', icon: Users, label: 'Clients' },
+  { path: '/project-search', icon: Search, label: 'Project Search' },
   { path: '/proposals', icon: FileText, label: 'Proposals' },
   { path: '/templates', icon: Layers, label: 'Templates' },
-  { path: '/projects', icon: Folder, label: 'Projects' },
   { path: '/ai', icon: Bot, label: 'AI Analysis' },
   { path: '/analytics', icon: BarChart3, label: 'Analytics' },
   { path: '/timezone', icon: Clock, label: 'Timezone Alerts' },
@@ -34,7 +36,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="border-b border-gray-800 p-6">
         <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-blue-600 p-2">
+          <div className="rounded-xl p-2" style={{ backgroundColor: '#FF9B51' }}>
             <Zap size={20} className="text-white" />
           </div>
           <div>
@@ -56,11 +58,11 @@ export default function Sidebar() {
               to={item.path}
               className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all"
               style={{
-                backgroundColor: isActive ? 'rgba(37, 99, 235, 0.2)' : 'transparent',
-                border: isActive ? '1px solid rgba(59, 130, 246, 0.4)' : '1px solid transparent',
+                backgroundColor: isActive ? 'rgba(255, 155, 81, 0.16)' : 'transparent',
+                border: isActive ? '1px solid rgba(255, 155, 81, 0.5)' : '1px solid transparent',
               }}
               onMouseEnter={(e) => {
-                if (!isActive) (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(31, 41, 55, 0.6)';
+                if (!isActive) (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(191, 201, 209, 0.12)';
               }}
               onMouseLeave={(e) => {
                 if (!isActive) (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
@@ -68,16 +70,16 @@ export default function Sidebar() {
             >
               <item.icon
                 size={18}
-                style={{ color: isActive ? '#93c5fd' : '#6b7280' }}
+                style={{ color: isActive ? '#FF9B51' : '#BFC9D1' }}
               />
               <span
                 className="font-medium text-sm"
-                style={{ color: isActive ? '#ffffff' : '#9ca3af' }}
+                style={{ color: isActive ? '#EAEFEF' : '#BFC9D1' }}
               >
                 {item.label}
               </span>
               {isActive && (
-                <div className="ml-auto h-1.5 w-1.5 rounded-full bg-blue-400" />
+                <div className="ml-auto h-1.5 w-1.5 rounded-full" style={{ backgroundColor: '#FF9B51' }} />
               )}
             </Link>
           );
@@ -87,15 +89,15 @@ export default function Sidebar() {
       {/* User */}
       <div className="border-t border-gray-800 p-4">
         {completion && completion.percentage < 100 && (
-          <Link to="/profile" className="block mb-3 p-2 rounded-lg bg-yellow-900/20 border border-yellow-700/30 hover:bg-yellow-900/30 transition cursor-pointer">
+          <Link to="/profile" className="block mb-3 p-2 rounded-lg transition cursor-pointer" style={{ backgroundColor: 'rgba(255, 155, 81, 0.14)', border: '1px solid rgba(255, 155, 81, 0.34)' }}>
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-yellow-400">Profile {completion.percentage}% complete</span>
-              <span className="text-xs text-yellow-400">{completion.percentage}%</span>
+              <span className="text-xs" style={{ color: '#FF9B51' }}>Profile {completion.percentage}% complete</span>
+              <span className="text-xs" style={{ color: '#FF9B51' }}>{completion.percentage}%</span>
             </div>
             <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-yellow-500 rounded-full transition-all"
-                style={{ width: `${completion.percentage}%` }}
+                className="h-full rounded-full transition-all"
+                style={{ backgroundColor: '#FF9B51', width: `${completion.percentage}%` }}
               />
             </div>
           </Link>
@@ -103,7 +105,7 @@ export default function Sidebar() {
         <div className="flex items-center gap-3 rounded-xl bg-gray-900 px-4 py-3">
           <div
             className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm"
-            style={{ backgroundColor: '#2563eb' }}
+            style={{ backgroundColor: '#FF9B51', color: '#25343F' }}
           >
             {user?.name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase()}
           </div>
@@ -111,9 +113,9 @@ export default function Sidebar() {
             <p className="text-white text-sm font-semibold truncate">{user?.name || 'User'}</p>
             <p className="truncate text-xs text-gray-500">{user?.email}</p>
           </div>
-          <button onClick={logout} style={{ color: '#6b7280' }}
-            onMouseEnter={(e) => (e.currentTarget as HTMLElement).style.color = '#ef4444'}
-            onMouseLeave={(e) => (e.currentTarget as HTMLElement).style.color = '#6b7280'}
+          <button onClick={logout} style={{ color: '#BFC9D1' }}
+            onMouseEnter={(e) => (e.currentTarget as HTMLElement).style.color = '#FF9B51'}
+            onMouseLeave={(e) => (e.currentTarget as HTMLElement).style.color = '#BFC9D1'}
           >
             <LogOut size={16} />
           </button>

@@ -8,7 +8,8 @@ import templateRoutes from './routes/template.routes';
 import proposalRoutes from './routes/proposal.routes';
 import aiRoutes from './routes/ai.routes';
 import recordRoutes from './routes/record.routes';
-import timezoneRoutes from './routes/timezone.routes';
+import clientRoutes from './routes/client.routes';
+import projectSearchRoutes from './routes/projectSearch.routes';
 
 dotenv.config();
 
@@ -25,7 +26,8 @@ app.use('/api/v1/templates', templateRoutes);
 app.use('/api/v1/proposals', proposalRoutes);
 app.use('/api/v1/ai', aiRoutes);
 app.use('/api/v1/records', recordRoutes);
-app.use('/api/v1/timezone', timezoneRoutes);
+app.use('/api/v1/clients', clientRoutes);
+app.use('/api/v1/projects', projectSearchRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'Freelancer API is running!' });

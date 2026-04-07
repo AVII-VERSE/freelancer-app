@@ -6,9 +6,12 @@ import Dashboard from './pages/Dashboard';
 import Proposals from './pages/Proposals';
 import Templates from './pages/Templates';
 import AIAnalysis from './pages/AIAnalysis';
+import Analytics from './pages/Analytics';
 import Timezone from './pages/Timezone';
 import Profile from './pages/Profile';
-import Analytics from './pages/Analytics';
+import Projects from './pages/Projects';
+import Clients from './pages/Clients';
+import ProjectSearch from './pages/ProjectSearch';
 import { useAuthStore } from './store/auth.store';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -23,9 +26,9 @@ export default function App() {
         position="top-right"
         toastOptions={{
           style: {
-            background: '#1f2937',
-            color: '#fff',
-            border: '1px solid #374151',
+            background: '#25343F',
+            color: '#EAEFEF',
+            border: '1px solid rgba(191, 201, 209, 0.28)',
           },
         }}
       />
@@ -33,6 +36,9 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+        <Route path="/projects" element={<PrivateRoute><Projects /></PrivateRoute>} />
+        <Route path="/clients" element={<PrivateRoute><Clients /></PrivateRoute>} />
+        <Route path="/project-search" element={<PrivateRoute><ProjectSearch /></PrivateRoute>} />
         <Route path="/proposals" element={<PrivateRoute><Proposals /></PrivateRoute>} />
         <Route path="/templates" element={<PrivateRoute><Templates /></PrivateRoute>} />
         <Route path="/ai" element={<PrivateRoute><AIAnalysis /></PrivateRoute>} />

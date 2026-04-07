@@ -22,7 +22,6 @@ model User {
   proposals Proposal[]
   templates Template[]
   records   ProjectRecord[]
-  timezoneAlerts TimezoneAlert[]
 }
 
 model UserProfile {
@@ -84,16 +83,4 @@ model ProjectRecord {
 
   user     User     @relation(fields: [userId], references: [id])
   proposal Proposal @relation(fields: [proposalId], references: [id])
-}
-
-model TimezoneAlert {
-  id         String   @id @default(cuid())
-  userId     String
-  name       String
-  timezone   String
-  alertTime  String
-  enabled    Boolean  @default(true)
-  createdAt  DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id])
 }

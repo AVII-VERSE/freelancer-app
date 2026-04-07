@@ -19,5 +19,34 @@ services:
     ports:
       - "6379:6379"
 
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: freelancer_api
+    ports:
+      - "5001:5000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password123@postgres:5432/freelancer_db
+      - JWT_SECRET=your-secret-key
+      - NODE_ENV=development
+    command: pnpm --filter @freelancer/api dev:docker
+    depends_on:
+      - postgres
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: freelancer_web
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:5001/api/v1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - api
+
 volumes:
   postgres_data:

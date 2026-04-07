@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
-import { Plus, Layers, Trash2, Search, Copy, FileText, Lightbulb, BookOpen, Files } from 'lucide-react';
+import { Plus, Layers, Trash2, Search, Copy } from 'lucide-react';
 import Layout from '../components/layout/Layout';
 
 interface Template {
@@ -10,10 +10,6 @@ interface Template {
   category: string;
   strategy: string;
   content: any;
-  instructions: string;
-  example: string;
-  purpose: string;
-  fileNotes: string;
   createdAt: string;
 }
 
@@ -25,10 +21,9 @@ export default function Templates() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [expanded, setExpanded] = useState<string | null>(null);
   const [form, setForm] = useState({
-    name: '', category: '', strategy: '', purpose: '',
+    name: '', category: '', strategy: '',
     greeting: '', opening: '', strategy_content: '',
     closing: '', regards: '', ps: '',
-    instructions: '', example: '', fileNotes: '',
   });
 
   const fetchTemplates = async () => {
@@ -46,10 +41,6 @@ export default function Templates() {
         name: form.name,
         category: form.category,
         strategy: form.strategy,
-        purpose: form.purpose,
-        instructions: form.instructions,
-        example: form.example,
-        fileNotes: form.fileNotes,
         content: {
           greeting: form.greeting,
           opening: form.opening,
@@ -61,7 +52,7 @@ export default function Templates() {
       });
       toast.success('Template created!');
       setShowForm(false);
-      setForm({ name: '', category: '', strategy: '', purpose: '', greeting: '', opening: '', strategy_content: '', closing: '', regards: '', ps: '', instructions: '', example: '', fileNotes: '' });
+      setForm({ name: '', category: '', strategy: '', greeting: '', opening: '', strategy_content: '', closing: '', regards: '', ps: '' });
       fetchTemplates();
     } catch {
       toast.error('Failed to create template');
@@ -131,10 +122,8 @@ export default function Templates() {
 
         {/* Create Form */}
         {showForm && (
-          <form onSubmit={handleCreate} className="bg-gray-900 rounded-2xl p-6 border border-gray-800 mb-6 space-y-6">
+          <form onSubmit={handleCreate} className="bg-gray-900 rounded-2xl p-6 border border-gray-800 mb-6 space-y-4">
             <h2 className="text-lg font-semibold">Create Template</h2>
-            
-            {/* Basic Info */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="text-sm text-gray-400 mb-1 block">Template Name</label>
@@ -174,58 +163,6 @@ export default function Templates() {
                   <option value="friendly">Friendly</option>
                 </select>
               </div>
-            </div>
-
-            {/* Purpose */}
-            <div>
-              <label className="text-sm text-gray-400 mb-2 block flex items-center gap-2">
-                <FileText size={14} /> What is this template for? (Purpose)
-              </label>
-              <input
-                value={form.purpose}
-                onChange={(e) => setForm({ ...form, purpose: e.target.value })}
-                className="w-full bg-gray-800 text-white rounded-xl px-4 py-3 border border-gray-700 focus:outline-none focus:border-blue-500"
-                placeholder="e.g., Upwork proposal for web development projects"
-              />
-            </div>
-
-            {/* Instructions */}
-            <div>
-              <label className="text-sm text-gray-400 mb-2 block flex items-center gap-2">
-                <Lightbulb size={14} /> AI Instructions (How to write the proposal)
-              </label>
-              <textarea
-                value={form.instructions}
-                onChange={(e) => setForm({ ...form, instructions: e.target.value })}
-                className="w-full bg-gray-800 text-white rounded-xl px-4 py-3 border border-gray-700 focus:outline-none focus:border-blue-500 h-32 resize-none"
-                placeholder="Instructions for AI to follow when generating proposals using this template..."
-              />
-            </div>
-
-            {/* Example */}
-            <div>
-              <label className="text-sm text-gray-400 mb-2 block flex items-center gap-2">
-                <BookOpen size={14} /> Example Proposal
-              </label>
-              <textarea
-                value={form.example}
-                onChange={(e) => setForm({ ...form, example: e.target.value })}
-                className="w-full bg-gray-800 text-white rounded-xl px-4 py-3 border border-gray-700 focus:outline-none focus:border-blue-500 h-48 resize-none"
-                placeholder="Write an example proposal that follows this template structure..."
-              />
-            </div>
-
-            {/* File Notes */}
-            <div>
-              <label className="text-sm text-gray-400 mb-2 block flex items-center gap-2">
-                <FileText size={14} /> Files to Attach / Notes
-              </label>
-              <textarea
-                value={form.fileNotes}
-                onChange={(e) => setForm({ ...form, fileNotes: e.target.value })}
-                className="w-full bg-gray-800 text-white rounded-xl px-4 py-3 border border-gray-700 focus:outline-none focus:border-blue-500 h-24 resize-none"
-                placeholder="List files to attach or notes about files to include with proposals..."
-              />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -316,19 +253,17 @@ export default function Templates() {
                       className="text-gray-500 hover:text-green-400 transition"
                       title="Duplicate template"
                     >
-                      <Files size={15} />
+                      <Copy size={15} />
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); handleCopy(template.content); }}
                       className="text-gray-500 hover:text-blue-400 transition"
-                      title="Copy content"
                     >
                       <Copy size={15} />
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); handleDelete(template.id); }}
                       className="text-gray-500 hover:text-red-400 transition"
-                      title="Delete template"
                     >
                       <Trash2 size={15} />
                     </button>

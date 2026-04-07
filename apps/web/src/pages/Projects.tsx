@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
-import { Plus, Folder, Trash2, Search, DollarSign, Globe, Code, Briefcase, Loader2, Edit2 } from 'lucide-react';
+import { Plus, Folder, Trash2, Search, DollarSign, Globe, Code, Loader2, Edit2 } from 'lucide-react';
 import Layout from '../components/layout/Layout';
 
 interface ProjectRecord {
@@ -133,14 +133,14 @@ export default function Projects() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-              <Folder size={24} className="text-blue-400" /> Projects
+            <h1 className="text-2xl font-bold flex items-center gap-3 text-white">
+              <Folder size={24} className="text-blue-500" /> Projects
             </h1>
-            <p className="text-gray-400 mt-1">{records.length} projects • ${totalEarnings.toLocaleString()} total earnings</p>
+            <p className="mt-1 text-gray-400">{records.length} projects - ${totalEarnings.toLocaleString()} total earnings</p>
           </div>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 transition font-medium"
+            className="px-5 py-2.5 rounded-xl flex items-center gap-2 transition font-medium text-white bg-blue-500 hover:bg-blue-600"
           >
             <Plus size={18} /> Add Project
           </button>
@@ -148,12 +148,12 @@ export default function Projects() {
 
         {/* Add/Edit Form */}
         {showForm && (
-          <form onSubmit={handleSubmit} className="bg-gray-900 rounded-2xl p-6 border border-gray-800 mb-6 space-y-4">
-            <h2 className="text-lg font-semibold">{editingId ? 'Edit Project' : 'Add New Project'}</h2>
+          <form onSubmit={handleSubmit} className="rounded-2xl p-6 mb-6 space-y-4 bg-gray-800 border border-gray-700">
+            <h2 className="text-lg font-semibold text-white">{editingId ? 'Edit Project' : 'Add New Project'}</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm text-gray-400 mb-1 block">Link to Won Proposal (optional)</label>
+                <label className="text-sm mb-1 block text-gray-400">Link to Won Proposal (optional)</label>
                 <select
                   value={form.proposalId}
                   onChange={(e) => {

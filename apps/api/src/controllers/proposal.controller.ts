@@ -27,18 +27,12 @@ export const createProposal = async (req: Request, res: Response) => {
 export const getProposals = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
-    const { status, search } = req.query;
+    const { status } = req.query;
 
     const proposals = await prisma.proposal.findMany({
       where: {
         userId,
         ...(status && { status: String(status) }),
-        ...(search && {
-          OR: [
-            { title: { contains: String(search), mode: 'insensitive' } },
-            { content: { contains: String(search), mode: 'insensitive' } },
-          ],
-        }),
         expiresAt: { gte: new Date() },
       },
       orderBy: { createdAt: 'desc' },
@@ -53,7 +47,7 @@ export const getProposals = async (req: Request, res: Response) => {
 export const getProposal = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
-    const { id } = req.params;
+    const id = String(req.params.id);
 
     const proposal = await prisma.proposal.findFirst({
       where: { id, userId },
@@ -73,7 +67,7 @@ export const getProposal = async (req: Request, res: Response) => {
 export const updateProposalStatus = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
-    const { id } = req.params;
+    const id = String(req.params.id);
     const { status } = req.body;
 
     const validStatuses = ['pending', 'won', 'lost', 'no_response'];
@@ -103,7 +97,7 @@ export const updateProposalStatus = async (req: Request, res: Response) => {
 export const deleteProposal = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
-    const { id } = req.params;
+    const id = String(req.params.id);
 
     const existing = await prisma.proposal.findFirst({
       where: { id, userId },
@@ -124,7 +118,7 @@ export const deleteProposal = async (req: Request, res: Response) => {
 export const cloneProposal = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
-    const { id } = req.params;
+    const id = String(req.params.id);
 
     const existing = await prisma.proposal.findFirst({
       where: { id, userId },

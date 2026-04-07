@@ -7,7 +7,6 @@ const router = Router();
 router.post('/', protect, createRecord);
 router.get('/', protect, getRecords);
 router.get('/analytics', protect, getAnalytics);
-router.get('/activity', protect, getAnalytics);
 router.put('/:id', protect, updateRecord);
 router.delete('/:id', protect, deleteRecord);
 router.get('/:id', protect, getRecord);
