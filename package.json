@@ -3,12 +3,19 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "pnpm run dev:kill-ports && turbo run dev",
+    "dev:kill-ports": "kill-port 5000 5001 5173",
+    "dev:full": "pnpm run dev:kill-ports && concurrently -k -n SCRAPER,TURBO \"node scraperMockBuiltin.js\" \"pnpm dev\"",
     "build": "turbo run build",
     "lint": "turbo run lint"
   },
   "devDependencies": {
+    "concurrently": "^9.2.1",
+    "kill-port": "^2.0.1",
     "turbo": "latest"
+  },
+  "engines": {
+    "node": "20.x"
   },
   "packageManager": "pnpm@10.30.1"
 }
