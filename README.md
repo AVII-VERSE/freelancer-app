@@ -97,24 +97,53 @@ pnpm --filter @freelancer/web dev
 pnpm build
 ```
 
-## Deploy On Render
+## Deploy On Vercel
 
-1. Push your latest code to GitHub.
-2. In Render, choose `New +` -> `Blueprint`.
-3. Select this repo and deploy using [render.yaml](render.yaml).
-4. After the first deploy, verify your API URL:
-	- API service URL should be `https://freelancer-api.onrender.com` if that name is available.
-	- If Render assigned a different API URL, update `VITE_API_URL` in the `freelancer-web` service env vars to:
-	  - `https://<your-api-service>.onrender.com/api/v1`
-5. Add required secret keys in the `freelancer-api` service:
-	- `GROQ_API_KEY`
-	- `GROQ_PROJECT_SEARCH_API_KEY`
-	- `OPENAI_API_KEY` (if you use OpenAI features)
+Deploy as two Vercel projects from the same repository:
 
-Render notes:
-- Database is provisioned automatically from the blueprint as `freelancer-db`.
-- Prisma generate/build/migrate runs during API build.
+1. API project
+	- Create a new Vercel project from this repo.
+	- Set Root Directory to `apps/api`.
+	- Framework preset: `Other`.
+	- Add env vars:
+	  - `DATABASE_URL`
+	  - `JWT_SECRET`
+	  - `GROQ_API_KEY`
+	  - `GROQ_PROJECT_SEARCH_API_KEY`
+	  - `OPENAI_API_KEY` (if used)
+	  - `CORS_ORIGIN` (set to your web app domain, e.g. `https://your-web.vercel.app`)
+	- Deploy.
+
+2. Web project
+	- Create another Vercel project from this repo.
+	- Set Root Directory to `apps/web`.
+	- Framework preset: `Vite`.
+	- Add env var:
+	  - `VITE_API_URL=https://<your-api-project>.vercel.app/api/v1`
+	- Deploy.
+
+Notes:
+- [apps/api/vercel.json](apps/api/vercel.json) routes all API paths through the serverless function.
+- [apps/web/vercel.json](apps/web/vercel.json) enables SPA route rewrites.
 - Local development commands are unchanged.
+
+## Deploy Web On Netlify
+
+Netlify is a good fit for the frontend app in [apps/web](apps/web).
+
+1. Create a new Netlify site from this GitHub repository.
+2. Keep base directory as repo root.
+3. Netlify will use [netlify.toml](netlify.toml) automatically:
+	- Install and build with pnpm workspace support
+	- Publish from `apps/web/dist`
+	- Apply SPA redirects for React Router
+4. In Netlify site environment variables, set:
+	- `VITE_API_URL=https://<your-api-domain>/api/v1`
+5. Trigger deploy.
+
+Important:
+- Your Express + Prisma API should be hosted separately (for example Vercel/Railway/Render/Fly).
+- Netlify in this setup deploys the web app only.
 
 ## Features
 
